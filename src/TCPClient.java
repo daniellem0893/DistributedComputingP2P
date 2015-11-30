@@ -165,6 +165,8 @@ public class TCPClient {
 		
 		while (connectBool == false) {
 			try {
+				TCPServerRouter temp = new TCPServerRouter();
+				connectBool = temp.getBool();
 				Thread.sleep(500);
 			} catch (InterruptedException e1) {
 				// TODO Auto-generated catch block
@@ -242,5 +244,9 @@ public class TCPClient {
 		out.close();
 		in.close();
 		socket.close();
+	}
+	
+	public String getIP(){
+		return host;
 	}
 }

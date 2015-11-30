@@ -8,6 +8,10 @@ public class TCPServerRouter {
 	
 	static int SockNum = 8181;
 	static boolean wait = true;
+	static boolean statBool = false;
+	
+	static String clientIP;
+	static String serverIP;
 	
     public static void main(String[] args) throws IOException {
     	TimeStuff.initTimer();
@@ -92,6 +96,8 @@ public class TCPServerRouter {
         try {
         	//int tempport = SockNum;
             serverSocket = new ServerSocket(SockNum);
+            TCPServer s = new TCPServer();
+            serverIP = s.getIP();
             System.out.println("ServerRouter is Listening on port: " + SockNum +".");
             messages.setText("ServerRouter is Listening on port: " + SockNum +".");
         } catch (IOException e) {
@@ -105,6 +111,8 @@ public class TCPServerRouter {
         {
             try {
                 clientSocket = serverSocket.accept();
+                TCPClient c = new TCPClient();
+                clientIP = c.getIP();
                 SThread t = new SThread(RoutingTable, clientSocket, ind); // creates a thread with a random port
                 t.start(); // starts the thread
                 ind++; // increments the index
@@ -120,5 +128,9 @@ public class TCPServerRouter {
         //closing connections
         clientSocket.close();
         serverSocket.close();
+    }
+    
+    public boolean getBool(){
+    return statBool;
     }
 }
