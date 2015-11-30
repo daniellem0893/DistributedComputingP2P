@@ -16,10 +16,14 @@ import javax.swing.text.DefaultCaret;
 public class TCPClient {
 
 	static String host;
+	static String tempHost;
 	static String routerName;
 	static String fileName;
+	static String connectName;
 	static int SockNum;
+	static int secSockNum;
 	static boolean wait = true;
+	static boolean connectBool = false;
 
 	public static void main(String[] args) throws IOException {
 		TimeStuff.initTimer();
@@ -29,13 +33,15 @@ public class TCPClient {
 		BufferedReader in = null; // for reading form ServerRouter
 		InetAddress addr = InetAddress.getLocalHost();
 		host = addr.getHostAddress(); // Client machine's IP
+		tempHost = "Machine X";
 		routerName = addr.getHostAddress();// "j263-08.cse1.spsu.edu"; //
 											// ServerRouter host name
 		SockNum = 8181; // port number
+		secSockNum = 8282;
 
 		JFrame f = new JFrame();
 		f.setTitle("Client");
-		f.setSize(305, 300);
+		f.setSize(305, 350);
 		f.setLocationRelativeTo(null);
 
 		final JPanel panel = new JPanel();
@@ -47,6 +53,10 @@ public class TCPClient {
 		final JTextField hostText = new JTextField(host);
 		JLabel port = new JLabel("Port Number: ");
 		final JTextField portText = new JTextField(Integer.toString(SockNum));
+		JLabel connect = new JLabel("Connect To: ");
+        final JTextField connectText = new JTextField(tempHost);
+        JLabel secSock = new JLabel("On Socket: ");
+        final JTextField secSockText = new JTextField(Integer.toString(secSockNum));
 		JLabel file = new JLabel("File Name: ");
 		final JTextField fileText = new JTextField("file.txt");
 		JButton submit = new JButton("submit");
@@ -63,6 +73,12 @@ public class TCPClient {
 
 		hostText.setEditable(true);
 		hostText.setColumns(15);
+		
+		connectText.setEditable(true);
+	    connectText.setColumns(15);
+	    
+	    secSockText.setEditable(true);
+	    secSockText.setColumns(15);
 
 		fileText.setEditable(true);
 		fileText.setColumns(15);
@@ -81,6 +97,10 @@ public class TCPClient {
 		panel.add(hostText);
 		panel.add(port);
 		panel.add(portText);
+		panel.add(connect);
+        panel.add(connectText);
+        panel.add(secSock);
+        panel.add(secSockText);
 		panel.add(file);
 		panel.add(fileText);
 		panel.add(submit);
@@ -100,7 +120,10 @@ public class TCPClient {
 				String tempHostName = hostText.getText();
 				host = tempHostName;
 				String tempPort = portText.getText();
+				String tempPort2 = secSockText.getText();
+				connectName = connectText.getText();
 				SockNum = Integer.parseInt(tempPort);
+				secSockNum = Integer.parseInt(tempPort2);
 				fileName = fileText.getText();
 				wait = false;
 			}
@@ -139,6 +162,33 @@ public class TCPClient {
 			messages.setText("Couldn't get I/O for the connection to: " + routerName);
 			System.exit(1);
 		}
+		
+		while (connectBool == false) {
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+		// Tries to connect to the Server
+				try {
+					socket = new Socket(connectName, secSockNum);
+					// BufferedInputStream bis = new BufferedInputStream(new
+					// FileInputStream(fileName));
+					// BufferedOutputStream bos = new
+					// BufferedOutputStream(socket.getOutputStream());
+					out = new PrintWriter(socket.getOutputStream(), true);
+					in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+				} catch (UnknownHostException e) {
+					System.err.println("Don't know about router: " + connectName);
+					messages.setText("Don't know about router: " + connectName);
+					System.exit(1);
+				} catch (IOException e) {
+					System.err.println("Couldn't get I/O for the connection to: " + connectName);
+					messages.setText("Couldn't get I/O for the connection to: " + connectName);
+					System.exit(1);
+				}
 
 		// Variables for message passing
 		Reader reader = new FileReader(fileName);
@@ -155,16 +205,16 @@ public class TCPClient {
 		out.println(address);// initial send (IP of the destination Server)
 		fromServer = in.readLine();// initial receive from router (verification
 									// of connection)
-		System.out.println("ServerRouter: " + fromServer);
-		messages.setText("ServerRouter: " + fromServer);
+		System.out.println("Connection: " + fromServer);
+		messages.setText("Connection: " + fromServer);
 		out.println(host); // Client sends the IP of its machine as initial send
 		t0 = System.currentTimeMillis();
 		TimeStuff.startTimer();
 
 		// Communication while loop
 		while ((fromServer = in.readLine()) != null) {
-			System.out.println("Server: " + fromServer.toUpperCase());
-			messages.setText(messages.getText() + "\n" + "Server: " + fromServer.toUpperCase());
+			System.out.println("Connection:: " + fromServer.toUpperCase());
+			messages.setText(messages.getText() + "\n" + "Connection: " + fromServer.toUpperCase());
 			 t1 = System.currentTimeMillis();
 			 TimeStuff.startTimer();
 			if (fromServer.equals("Bye.")) // exit statement
@@ -179,7 +229,7 @@ public class TCPClient {
 			fromUser = fromFile.readLine(); // reading strings from a file
 			if (fromUser != null) {
 				System.out.println("Client: " + fromUser);
-				messages.setText(messages.getText() + "\n" + "Client: " + fromUser);
+				messages.setText(messages.getText() + "\n" + "Connection: " + fromUser);
 				out.println(fromUser); // sending the strings to the Server via
 										// ServerRouter
 				t0 = System.currentTimeMillis();

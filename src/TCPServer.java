@@ -17,8 +17,12 @@ public class TCPServer {
 	
 	static boolean wait = true;
 	static int SockNum;
+	static int secSockNum;
 	static String host;
+	static String tempHost;
 	static String routerName;
+	static String connectName;
+	static boolean connectBool;
 	
     public static void main(String[] args) throws IOException {
       	TimeStuff.initTimer();
@@ -27,14 +31,16 @@ public class TCPServer {
         PrintWriter out = null; // for writing to ServerRouter
         BufferedReader in = null; // for reading form ServerRouter
         InetAddress addr = InetAddress.getLocalHost();
-        host = addr.getHostAddress(); // Server machine's IP			
+        host = addr.getHostAddress(); // Server machine's IP
+        tempHost = "Machine Y";
        // String routerName = "j263-08.cse1.spsu.edu"; // ServerRouter host name
         routerName = addr.getHostAddress();
         SockNum = 8181; // port number
+        secSockNum = 8282;
         
         JFrame f = new JFrame();
         f.setTitle("Server");
-        f.setSize(300, 275);
+        f.setSize(300, 325);
         f.setLocationRelativeTo(null);
        
         
@@ -47,6 +53,10 @@ public class TCPServer {
         final JTextField hostText = new JTextField(host);
         JLabel port = new JLabel("Port Number: ");
         final JTextField portText = new JTextField(Integer.toString(SockNum));
+        JLabel connect = new JLabel("Connect To: ");
+        final JTextField connectText = new JTextField(tempHost);
+        JLabel secSock = new JLabel("On Socket: ");
+        final JTextField secSockText = new JTextField(Integer.toString(secSockNum));
         JButton submit = new JButton("submit");
         JButton results = new JButton("results");
         
@@ -62,6 +72,12 @@ public class TCPServer {
         hostText.setEditable(true);
         hostText.setColumns(15);
         
+        connectText.setEditable(true);
+        connectText.setColumns(15);
+        
+        secSockText.setEditable(true);
+        secSockText.setColumns(15);
+        
         messages.setColumns(25);
         messages.setRows(5);
         messages.setLineWrap(true);
@@ -73,6 +89,10 @@ public class TCPServer {
         panel.add(hostText);
         panel.add(port);
         panel.add(portText);
+        panel.add(connect);
+        panel.add(connectText);
+        panel.add(secSock);
+        panel.add(secSockText);
         panel.add(submit);
         panel.add(scroll);
         panel.add(results);
@@ -90,7 +110,10 @@ public class TCPServer {
               String tempHostName = hostText.getText();
               host = tempHostName;
               String tempPort = portText.getText();
+              String tempPort2 = secSockText.getText();
+              connectName = connectText.getText();
               SockNum = Integer.parseInt(tempPort);
+              secSockNum = Integer.parseInt(tempPort2);
               wait = false;
             }
         });
@@ -125,6 +148,33 @@ public class TCPServer {
             messages.setText("Couldn't get I/O for the connection to: " + routerName);
             System.exit(1);
         }
+        
+        while (connectBool == false) {
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+		// Tries to connect to the Server
+				try {
+					Socket = new Socket(connectName, secSockNum);
+					// BufferedInputStream bis = new BufferedInputStream(new
+					// FileInputStream(fileName));
+					// BufferedOutputStream bos = new
+					// BufferedOutputStream(socket.getOutputStream());
+					out = new PrintWriter(Socket.getOutputStream(), true);
+					in = new BufferedReader(new InputStreamReader(Socket.getInputStream()));
+				} catch (UnknownHostException e) {
+					System.err.println("Don't know about router: " + connectName);
+					messages.setText("Don't know about router: " + connectName);
+					System.exit(1);
+				} catch (IOException e) {
+					System.err.println("Couldn't get I/O for the connection to: " + connectName);
+					messages.setText("Couldn't get I/O for the connection to: " + connectName);
+					System.exit(1);
+				}
 				
       	// Variables for message passing			
         String fromServer; // messages sent to ServerRouter
@@ -135,18 +185,18 @@ public class TCPServer {
         // Communication process (initial sends/receives)
         out.println(address);// initial send (IP of the destination Client)
         fromClient = in.readLine();// initial receive from router (verification of connection)
-        System.out.println("ServerRouter: " + fromClient);
-        messages.setText("ServerRouter: " + fromClient);
+        System.out.println("Connection: " + fromClient);
+        messages.setText("Connection: " + fromClient);
 			         
         // Communication while loop
       	while ((fromClient = in.readLine()) != null) {
-            System.out.println("Client said: " + fromClient);
-            messages.setText(messages.getText() + "\n" + "Client said: " + fromClient);
+            System.out.println("Connection said: " + fromClient);
+            messages.setText(messages.getText() + "\n" + "Connection said: " + fromClient);
             if (fromClient.equals("Bye.")) // exit statement
                 break;
             fromServer = fromClient.toUpperCase(); // converting received message to upper case
-            System.out.println("Server said: " + fromServer);
-            messages.setText(messages.getText() + "\n" + "Server said: " + fromServer);
+            System.out.println("Connection said: " + fromServer);
+            messages.setText(messages.getText() + "\n" + "Connection said: " + fromServer);
             out.println(fromServer); // sending the converted message back to the Client via ServerRouter
         }
 			
