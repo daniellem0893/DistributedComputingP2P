@@ -23,7 +23,7 @@ public class TCPClient {
 	static int SockNum;
 	static int secSockNum;
 	static boolean wait = true;
-	static boolean connectBool = false;
+	static boolean connectBool = true;
 
 	public static void main(String[] args) throws IOException {
 		TimeStuff.initTimer();
@@ -174,6 +174,49 @@ public class TCPClient {
 			}
 		}
 		// Tries to connect to the Server
+		
+		Reader reader = new FileReader(fileName);
+		BufferedReader fromFile = new BufferedReader(reader);
+
+        String serverHostname = new String (host);
+
+        if (args.length > 0)
+           serverHostname = args[0];
+        System.out.println ("Attemping to connect to host " +
+		serverHostname + " on port 10007.");
+
+        Socket echoSocket = null;
+        PrintWriter PWout = null;
+        BufferedReader BRin = null;
+
+        try {
+            // echoSocket = new Socket("taranis", 7);
+            echoSocket = new Socket(serverHostname, secSockNum);
+            PWout = new PrintWriter(echoSocket.getOutputStream(), true);
+            BRin = new BufferedReader(new InputStreamReader(
+                                        echoSocket.getInputStream()));
+        } catch (UnknownHostException e) {
+            System.err.println("Don't know about host: " + serverHostname);
+            System.exit(1);
+        } catch (IOException e) {
+            System.err.println("Couldn't get I/O for "
+                               + "the connection to: " + serverHostname);
+            System.exit(1);
+        }
+
+	BufferedReader stdIn = new BufferedReader(
+                                   new InputStreamReader(System.in));
+	String userInput;
+
+        //System.out.print ("input: ");
+	while ((userInput = fromFile.readLine()) != null) {
+	    PWout.println(userInput);
+	    System.out.print ("input: " + userInput + '\n');
+	    System.out.println("echo: " + BRin.readLine() + '\n');
+	}
+
+		
+		/*
 				try {
 					socket = new Socket(connectName, secSockNum);
 					// BufferedInputStream bis = new BufferedInputStream(new
@@ -244,6 +287,7 @@ public class TCPClient {
 		out.close();
 		in.close();
 		socket.close();
+		*/
 	}
 	
 	public String getIP(){

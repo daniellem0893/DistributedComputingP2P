@@ -22,7 +22,7 @@ public class TCPServer {
 	static String tempHost;
 	static String routerName;
 	static String connectName;
-	static boolean connectBool;
+	static boolean connectBool = true;
 	
     public static void main(String[] args) throws IOException {
       	TimeStuff.initTimer();
@@ -159,16 +159,53 @@ public class TCPServer {
 				e1.printStackTrace();
 			}
 		}
-		// Tries to connect to the Server
-				try {
-					Socket = new Socket(connectName, secSockNum);
-					// BufferedInputStream bis = new BufferedInputStream(new
-					// FileInputStream(fileName));
-					// BufferedOutputStream bos = new
-					// BufferedOutputStream(socket.getOutputStream());
-					out = new PrintWriter(Socket.getOutputStream(), true);
-					in = new BufferedReader(new InputStreamReader(Socket.getInputStream()));
-				} catch (UnknownHostException e) {
+        //ServerSocket s = new ServerSocket(secSockNum);
+		// Waits to connect with the Client
+        
+        ServerSocket serverSocket = null; 
+
+        try { 
+             serverSocket = new ServerSocket(secSockNum); 
+            } 
+        catch (IOException e) 
+            { 
+             System.err.println("Could not listen on port: " +secSockNum+"."); 
+             System.exit(1); 
+            } 
+
+        Socket clientSocket = null; 
+        System.out.println ("Waiting for connection.....");
+
+        try { 
+             clientSocket = serverSocket.accept(); 
+            } 
+        catch (IOException e) 
+            { 
+             System.err.println("Accept failed."); 
+             System.exit(1); 
+            } 
+
+        System.out.println ("Connection successful");
+        System.out.println ("Waiting for input.....");
+
+        PrintWriter PWout = new PrintWriter(clientSocket.getOutputStream(), 
+                                          true); 
+        BufferedReader BRin = new BufferedReader( 
+                new InputStreamReader( clientSocket.getInputStream())); 
+
+        String inputLine; 
+
+        while ((inputLine = BRin.readLine()) != null) 
+            { 
+             System.out.println ("Server: " + inputLine); 
+             PWout.println(inputLine.toUpperCase()); 
+
+             if (inputLine.equals("Bye.")) 
+                 break; 
+            } 
+				
+				
+					/* catch (UnknownHostException e) {
 					System.err.println("Don't know about router: " + connectName);
 					messages.setText("Don't know about router: " + connectName);
 					System.exit(1);
@@ -201,11 +238,13 @@ public class TCPServer {
             messages.setText(messages.getText() + "\n" + "Connection said: " + fromServer);
             out.println(fromServer); // sending the converted message back to the Client via ServerRouter
         }
+        
 			
         // closing connections
         out.close();
         in.close();
         Socket.close();
+        */
     }
     
     public String getIP(){
