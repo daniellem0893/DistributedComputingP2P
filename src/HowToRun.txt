@@ -1,0 +1,6 @@
+Run ServerRouterM
+Run ServerRouterN
+Run Server
+Run Client
+
+Have a text file labelled "file.txt" or rename the file in the GUI to match a text file in your project.

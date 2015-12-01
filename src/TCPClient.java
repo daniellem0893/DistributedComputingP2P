@@ -23,7 +23,7 @@ public class TCPClient {
 	static int SockNum;
 	static int secSockNum;
 	static boolean wait = true;
-	static boolean connectBool = true;
+	static boolean connectBool = false;
 
 	public static void main(String[] args) throws IOException {
 		TimeStuff.initTimer();
@@ -33,11 +33,11 @@ public class TCPClient {
 		BufferedReader in = null; // for reading form ServerRouter
 		InetAddress addr = InetAddress.getLocalHost();
 		host = addr.getHostAddress(); // Client machine's IP
-		tempHost = "Machine X";
+		tempHost = "Machine 0";
 		routerName = addr.getHostAddress();// "j263-08.cse1.spsu.edu"; //
 											// ServerRouter host name
 		SockNum = 8181; // port number
-		secSockNum = 8282;
+		secSockNum = 9191;
 
 		JFrame f = new JFrame();
 		f.setTitle("Client");
@@ -144,35 +144,55 @@ public class TCPClient {
 			}
 		}
 
-		// Tries to connect to the ServerRouter
+		
+		
+		
+		
+		// Tries to connect to the ServerRouterM
+		String serverHostname1 = new String (host);
+
+        if (args.length > 0)
+           serverHostname1 = args[0];
+        System.out.println ("Attemping to connect to host " +
+		serverHostname1 + " on port " +SockNum + ".");
+
+        Socket echoSocket1 = null;
+        PrintWriter out1 = null;
+        BufferedReader in1 = null;
+
+        try {
+            echoSocket1 = new Socket(serverHostname1, SockNum);
+            out1 = new PrintWriter(echoSocket1.getOutputStream(), true);
+            in1 = new BufferedReader(new InputStreamReader(
+                                        echoSocket1.getInputStream()));
+        } catch (UnknownHostException e) {
+            System.err.println("Don't know about host: " + serverHostname1);
+            System.exit(1);
+        } catch (IOException e) {
+            System.err.println("Couldn't get I/O for "
+                               + "the connection to: " + serverHostname1);
+            System.exit(1);
+        }
+	
+		BufferedReader stdIn1 = new BufferedReader(
+	                                   new InputStreamReader(System.in));
+		String userInput1;
+	
+		    out1.println("IP Request for: " + connectName);
+		    tempHost = in1.readLine();
+	
+		out1.close();
+		in1.close();
+		stdIn1.close();
+		echoSocket1.close();
+		
 		try {
-			socket = new Socket(routerName, SockNum);
-			// BufferedInputStream bis = new BufferedInputStream(new
-			// FileInputStream(fileName));
-			// BufferedOutputStream bos = new
-			// BufferedOutputStream(socket.getOutputStream());
-			out = new PrintWriter(socket.getOutputStream(), true);
-			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-		} catch (UnknownHostException e) {
-			System.err.println("Don't know about router: " + routerName);
-			messages.setText("Don't know about router: " + routerName);
-			System.exit(1);
-		} catch (IOException e) {
-			System.err.println("Couldn't get I/O for the connection to: " + routerName);
-			messages.setText("Couldn't get I/O for the connection to: " + routerName);
-			System.exit(1);
+			Thread.sleep(5000);
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
 		
-		while (connectBool == false) {
-			try {
-				TCPServerRouter temp = new TCPServerRouter();
-				connectBool = temp.getBool();
-				Thread.sleep(500);
-			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		}
 		// Tries to connect to the Server
 		
 		Reader reader = new FileReader(fileName);
@@ -183,7 +203,7 @@ public class TCPClient {
         if (args.length > 0)
            serverHostname = args[0];
         System.out.println ("Attemping to connect to host " +
-		serverHostname + " on port 10007.");
+		serverHostname + " on port " + secSockNum + ".");
 
         Socket echoSocket = null;
         PrintWriter PWout = null;
@@ -204,90 +224,16 @@ public class TCPClient {
             System.exit(1);
         }
 
-	BufferedReader stdIn = new BufferedReader(
-                                   new InputStreamReader(System.in));
-	String userInput;
-
-        //System.out.print ("input: ");
-	while ((userInput = fromFile.readLine()) != null) {
-	    PWout.println(userInput);
-	    System.out.print ("input: " + userInput + '\n');
-	    System.out.println("echo: " + BRin.readLine() + '\n');
-	}
-
-		
-		/*
-				try {
-					socket = new Socket(connectName, secSockNum);
-					// BufferedInputStream bis = new BufferedInputStream(new
-					// FileInputStream(fileName));
-					// BufferedOutputStream bos = new
-					// BufferedOutputStream(socket.getOutputStream());
-					out = new PrintWriter(socket.getOutputStream(), true);
-					in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-				} catch (UnknownHostException e) {
-					System.err.println("Don't know about router: " + connectName);
-					messages.setText("Don't know about router: " + connectName);
-					System.exit(1);
-				} catch (IOException e) {
-					System.err.println("Couldn't get I/O for the connection to: " + connectName);
-					messages.setText("Couldn't get I/O for the connection to: " + connectName);
-					System.exit(1);
-				}
-
-		// Variables for message passing
-		Reader reader = new FileReader(fileName);
-		BufferedReader fromFile = new BufferedReader(reader); // reader for the
-																// string file
-		String fromServer; // messages received from ServerRouter
-		String fromUser; // messages sent to ServerRouter
-		String address = addr.getHostAddress();// "10.5.2.109"; // destination
-												// IP (Server)
-		long t0, t1, t;
-		long total = 0;
-
-		// Communication process (initial sends/receives
-		out.println(address);// initial send (IP of the destination Server)
-		fromServer = in.readLine();// initial receive from router (verification
-									// of connection)
-		System.out.println("Connection: " + fromServer);
-		messages.setText("Connection: " + fromServer);
-		out.println(host); // Client sends the IP of its machine as initial send
-		t0 = System.currentTimeMillis();
-		TimeStuff.startTimer();
-
-		// Communication while loop
-		while ((fromServer = in.readLine()) != null) {
-			System.out.println("Connection:: " + fromServer.toUpperCase());
-			messages.setText(messages.getText() + "\n" + "Connection: " + fromServer.toUpperCase());
-			 t1 = System.currentTimeMillis();
-			 TimeStuff.startTimer();
-			if (fromServer.equals("Bye.")) // exit statement
-				break;
-			 t = t1 - t0;
-			 total = total + t;
-			 System.out.println("Cycle time: " + t);
-			TimeStuff.stopTimer("Cycle time: ");
-			System.out.println("Total time: " + total);
-			messages.setText(messages.getText() + "\n" + "Total time: " + total);
-
-			fromUser = fromFile.readLine(); // reading strings from a file
-			if (fromUser != null) {
-				System.out.println("Client: " + fromUser);
-				messages.setText(messages.getText() + "\n" + "Connection: " + fromUser);
-				out.println(fromUser); // sending the strings to the Server via
-										// ServerRouter
-				t0 = System.currentTimeMillis();
-			}
+		BufferedReader stdIn = new BufferedReader(
+	                                   new InputStreamReader(System.in));
+		String userInput;
+	
+	        //System.out.print ("input: ");
+		while ((userInput = fromFile.readLine()) != null) {
+		    PWout.println(userInput);
+		    System.out.print ("input: " + userInput + '\n');
+		    System.out.println("echo: " + BRin.readLine() + '\n');
 		}
-		
-		
-
-		// closing connections
-		out.close();
-		in.close();
-		socket.close();
-		*/
 	}
 	
 	public String getIP(){
