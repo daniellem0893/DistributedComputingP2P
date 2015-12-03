@@ -167,7 +167,7 @@ public class TCPServer {
      		String userInput1;
      	
      		    out1.println("Waiting for connections");
-     		    tempHost = in1.readLine();
+     		   // tempHost = in1.readLine();
      		    
      		   try {
    				Thread.sleep(500);
@@ -236,47 +236,6 @@ public class TCPServer {
                  break; 
             } 
 				
-				
-					/* catch (UnknownHostException e) {
-					System.err.println("Don't know about router: " + connectName);
-					messages.setText("Don't know about router: " + connectName);
-					System.exit(1);
-				} catch (IOException e) {
-					System.err.println("Couldn't get I/O for the connection to: " + connectName);
-					messages.setText("Couldn't get I/O for the connection to: " + connectName);
-					System.exit(1);
-				}
-				
-      	// Variables for message passing			
-        String fromServer; // messages sent to ServerRouter
-        String fromClient; // messages received from ServerRouter      
-       // String address ="10.5.3.196"; // destination IP (Client)
-		String address = addr.getHostAddress();
-        
-        // Communication process (initial sends/receives)
-        out.println(address);// initial send (IP of the destination Client)
-        fromClient = in.readLine();// initial receive from router (verification of connection)
-        System.out.println("Connection: " + fromClient);
-        messages.setText("Connection: " + fromClient);
-			         
-        // Communication while loop
-      	while ((fromClient = in.readLine()) != null) {
-            System.out.println("Connection said: " + fromClient);
-            messages.setText(messages.getText() + "\n" + "Connection said: " + fromClient);
-            if (fromClient.equals("Bye.")) // exit statement
-                break;
-            fromServer = fromClient.toUpperCase(); // converting received message to upper case
-            System.out.println("Connection said: " + fromServer);
-            messages.setText(messages.getText() + "\n" + "Connection said: " + fromServer);
-            out.println(fromServer); // sending the converted message back to the Client via ServerRouter
-        }
-        
-			
-        // closing connections
-        out.close();
-        in.close();
-        Socket.close();
-        */
     }
     
     public String getIP(){

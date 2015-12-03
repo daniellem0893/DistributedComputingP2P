@@ -72,6 +72,7 @@ public class ServerRouterM {
 	        	 
 	        	 InetAddress addr = InetAddress.getLocalHost();
 	        	 String host = addr.getHostAddress();
+	        	 String altAddress = "edit me";
 	        	 
 	        	 try {
 	 				Thread.sleep(500);
@@ -79,7 +80,7 @@ public class ServerRouterM {
 	 				// TODO Auto-generated catch block
 	 				e1.printStackTrace();
 	 			}
-	        	 
+	        	 //switch host for altAddress when running on separate machines
 	        	 String serverHostname = new String (host);
 	        	 int SockNum2 = 9999;
 
@@ -112,21 +113,25 @@ public class ServerRouterM {
 	
 		             //System.out.print ("input: ");
 		     	    PWout.println(machineName);
-		     	    machineIP = BRin.readLine();
-		     	    
 		     	   try {
-						Thread.sleep(500);
+						Thread.sleep(5000);
 					} catch (InterruptedException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
+		     	   String tempIP;
+		     	    tempIP = BRin.readLine();
+		     	    machineIP = tempIP;
+		     	    System.out.println(machineIP);
+		     	   // machineIP = "192.168.244.1";
+		     	    
 		     	
 		     	PWout.close();
 		    	BRin.close();
 		    	stdIn.close();
 		    	echoSocket.close();
 	         }
-	         
+	         System.out.println(machineIP);
 	         out.println(machineIP);
 	         try {
 					Thread.sleep(500);

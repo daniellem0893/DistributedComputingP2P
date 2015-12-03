@@ -179,7 +179,14 @@ public class TCPClient {
 		String userInput1;
 	
 		    out1.println("IP Request for: " + connectName);
+		    try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		    tempHost = in1.readLine();
+		    System.out.println(tempHost);
 	
 		out1.close();
 		in1.close();
@@ -198,7 +205,7 @@ public class TCPClient {
 		Reader reader = new FileReader(fileName);
 		BufferedReader fromFile = new BufferedReader(reader);
 
-        String serverHostname = new String (host);
+        String serverHostname = new String (tempHost);
 
         if (args.length > 0)
            serverHostname = args[0];
@@ -210,7 +217,6 @@ public class TCPClient {
         BufferedReader BRin = null;
 
         try {
-            // echoSocket = new Socket("taranis", 7);
             echoSocket = new Socket(serverHostname, secSockNum);
             PWout = new PrintWriter(echoSocket.getOutputStream(), true);
             BRin = new BufferedReader(new InputStreamReader(

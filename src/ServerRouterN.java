@@ -14,6 +14,7 @@ public class ServerRouterN {
 	 public static void main(String[] args) throws IOException 
 	   { 
 		 int index = 0;
+		 int index2 = 0;
 		 
 	    ServerSocket serverSocket = null; 
 
@@ -32,8 +33,8 @@ public class ServerRouterN {
 	    try { 
 	         clientSocket = serverSocket.accept(); 
 	         RoutingTable temp = new RoutingTable();
-	         temp.address = clientSocket.getInetAddress().toString();
-	         temp.name = "Machine " + String.valueOf(index);
+	         temp.address = clientSocket.getInetAddress().toString().substring(1);
+	         temp.name = "Machine " + index;
 	         tableN[index] = temp;
 	         index++;
 	        } 
@@ -110,7 +111,8 @@ public class ServerRouterN {
 	        		    		{
 	        		    			if(tableN[i].name.contains(machineName2))
 	        		    			{
-	        		    				out.println("Machine IP: " + tableN[i].address);
+	        		    				System.out.println("Machine IP for: " + machineName2 + " " + tableN[i].address);
+	        		    				out2.println(tableN[i].address);
 	        		    			}
 	        		    		}
 	        		    	
